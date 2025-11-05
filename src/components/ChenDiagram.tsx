@@ -1,7 +1,7 @@
 // components/ChenDiagram.tsx
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from 'react'; // Added useEffect
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import ReactFlow, {
   Controls,
   Background,
@@ -72,15 +72,11 @@ const btnMuted = `${btnBase} ${btnShadow} bg-gray-100 text-black hover:bg-gray-2
 function ChenDiagramInner() {
   const [sqlInput, setSqlInput] = useState(defaultSql);
   const [showStarPopup, setShowStarPopup] = useState(false);
-  
-  // --- ADDED FOR INFO POPUP ---
   const [showInfoPopup, setShowInfoPopup] = useState(false);
 
-  // --- ADDED EFFECT TO SHOW POPUP ON LOAD ---
   useEffect(() => {
-    // Show the info popup when the component mounts
     setShowInfoPopup(true);
-  }, []); // Empty dependency array ensures this runs only once
+  }, []);
 
   const initialLayout = useMemo(() => getInitialLayout(), []);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialLayout.nodes);
@@ -95,20 +91,12 @@ function ChenDiagramInner() {
 
   const downloadImage = useCallback(async (format: 'png' | 'svg') => {
     const { toPng, toSvg } = await import('dom-to-image-more');
-
     const diagramWrapper = document.getElementById('diagram-wrapper') as HTMLElement;
-
     if (!diagramWrapper) {
       console.error('Diagram wrapper element not found. Cannot export image.');
       return;
     }
-
-    const options = {
-      backgroundColor: 'white',
-      pixelRatio: 2,
-      cacheBust: true,
-    };
-
+    const options = { backgroundColor: 'white', pixelRatio: 2, cacheBust: true };
     try {
       if (format === 'svg') {
         const dataUrl = await toSvg(diagramWrapper, options);
@@ -124,10 +112,10 @@ function ChenDiagramInner() {
   }, [setShowStarPopup]);
 
   return (
-    // --- WRAPPER DIV: Changed to flex-col to add footer ---
+    // --- WRAPPER DIV: Use h-screen to fill viewport ---
     <div className="flex flex-col h-screen w-full bg-gray-100 font-sans">
       
-      {/* --- NEW: "How It Works" Popup --- */}
+      {/* --- "How It Works" Popup (No changes) --- */}
       {showInfoPopup && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
@@ -173,7 +161,7 @@ function ChenDiagramInner() {
         </div>
       )}
 
-      {/* Star Popup */}
+      {/* Star Popup (No changes) */}
       {showStarPopup && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
@@ -210,11 +198,13 @@ function ChenDiagramInner() {
         </div>
       )}
 
-      {/* --- MAIN CONTENT: Added flex-grow --- */}
-      <div className="flex flex-row flex-grow p-4 gap-4">
+      {/* --- MAIN CONTENT: flex-col (mobile) and md:flex-row (desktop) --- */}
+      <div className="flex flex-col md:flex-row flex-grow p-4 gap-4">
         
         {/* Input Panel (Left) */}
-        <div className="flex flex-col w-full md:w-1/3 lg:w-1/4 h-full bg-white p-4 border-2 border-black rounded-md shadow-[8px_8px_0px_#000]">
+        {/* UPDATED: w-full (mobile) / md:w-1/3 (desktop) */}
+        {/* UPDATED: h-auto (mobile) / md:h-full (desktop) */}
+        <div className="flex flex-col w-full md:w-1/3 lg:w-1/4 h-auto md:h-full bg-white p-4 border-2 border-black rounded-md shadow-[8px_8px_0px_#000]">
           <h2 className="text-2xl font-bold tracking-tight text-black mb-4">
             SQL Input
           </h2>
@@ -222,7 +212,8 @@ function ChenDiagramInner() {
           <textarea
             value={sqlInput}
             onChange={(e) => setSqlInput(e.target.value)}
-            className="w-full p-2 border-2 border-black rounded-md font-mono text-sm flex-grow focus:outline-none focus:ring-2 focus:ring-black text-black"
+            // UPDATED: h-48 (mobile) / md:h-auto md:flex-grow (desktop)
+            className="w-full p-2 border-2 border-black rounded-md font-mono text-sm h-48 md:h-auto md:flex-grow focus:outline-none focus:ring-2 focus:ring-black text-black"
             placeholder="Paste your CREATE TABLE statements here..."
           />
 
@@ -253,7 +244,8 @@ function ChenDiagramInner() {
         </div>
 
         {/* Diagram Panel (Right) */}
-        <div className="flex flex-col flex-grow h-full">
+        {/* UPDATED: h-96 (mobile) / md:h-full (desktop) */}
+        <div className="flex flex-col flex-grow h-96 md:h-full">
           <div
             id="diagram-wrapper"
             className="bg-white border-2 border-black rounded-md flex-grow shadow-[8px_8px_0px_#000] overflow-hidden"
@@ -266,7 +258,6 @@ function ChenDiagramInner() {
               nodeTypes={nodeTypes}
               fitView
               minZoom={0.1}
-      
               maxZoom={4}
               className="bg-white"
             >
@@ -277,20 +268,23 @@ function ChenDiagramInner() {
         </div>
       </div>
       
-      {/* --- NEW FOOTER --- */}
-      <footer className="w-full text-right py-2 px-4 text-xs text-gray-300 flex-shrink-0 ">
+      {/* --- FOOTER --- */}
+      {/* UPDATED: text-center (mobile) / md:text-right (desktop) */}
+      {/* UPDATED: text-gray-500 for visibility */}
+      <footer className="w-full text-center md:text-right py-2 px-4 text-xs text-gray-500 flex-shrink-0 ">
         Made with <span role="img" aria-label="heart">❤️</span> by{' '}
         <a 
           href="https://github.com/ojasharma" 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="font-bold text-gray-400 hover:underline"
+          // UPDATED: text-gray-600 for visibility
+          className="font-bold text-gray-600 hover:underline"
         >
           ojasharma
         </a>
       </footer>
 
-      {/* Global Styles */}
+      {/* Global Styles (No changes) */}
       <style jsx global>{`
         :root {
           font-family: 'Inter', sans-serif, system-ui;
@@ -307,7 +301,7 @@ function ChenDiagramInner() {
         .react-flow__controls button {
           border-bottom: 2px solid #000 !important;
           background-color: #fff !important;
-          color: #000 !importa
+          color: #000 !important; /* Fixed typo */
           border-radius: 4px;
         }
         .react-flow__controls button:hover {
